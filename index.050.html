@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生活意識に関するアンケート調査</title>
+<style>
+  :root{
+    --bg:#f4f5f7;
+    --card:#ffffff;
+    --ink:#1f2933;
+    --sub:#52606d;
+    --line:#e1e4e8;
+    --accent:#2563eb;
+    --accent-dark:#1d4ed8;
+    --accent-soft:#eef2ff;
+    --danger:#dc2626;
+    --ok:#059669;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:var(--bg); }
+  body{
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Meiryo","Segoe UI",sans-serif;
+    color:var(--ink);
+    line-height:1.7;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .progress-wrap{
+    position:sticky; top:0; z-index:10;
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+    padding:12px 20px;
+  }
+  .progress-inner{ max-width:720px; margin:0 auto; }
+  .progress-label{ font-size:12px; color:var(--sub); margin-bottom:6px; }
+  .progress-bar{ height:8px; background:#eceef1; border-radius:99px; overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:var(--accent); border-radius:99px; transition:width .35s ease; }
+  .container{ max-width:720px; margin:0 auto; padding:32px 20px 80px; }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:32px 28px;
+    box-shadow:0 4px 18px rgba(15,23,42,.05);
+  }
+  h1{ font-size:22px; line-height:1.5; margin-bottom:20px; }
+  h2.qtitle{ font-size:19px; line-height:1.6; margin-bottom:4px; font-weight:700; }
+  .qnum{ display:inline-block; font-size:12px; font-weight:700; color:var(--accent); letter-spacing:.06em; margin-bottom:10px; }
+  .lead{ color:var(--sub); font-size:15px; margin-bottom:14px; }
+  .intro p{ margin-bottom:14px; font-size:15px; color:var(--sub); }
+  .intro .meta{ font-size:14px; color:var(--ink); background:var(--bg); border-radius:10px; padding:14px 16px; margin-bottom:16px; }
+  .intro .meta div{ margin:2px 0; }
+  .audio-note{
+    background:#fffbeb; border:1px solid #fde68a; color:#92400e;
+    border-radius:10px; padding:12px 14px; font-size:14px; margin-bottom:18px;
+  }
+  .options{ list-style:none; margin:18px 0 6px; display:flex; flex-direction:column; gap:10px; }
+  .opt{
+    display:flex; align-items:center; gap:12px;
+    border:1.5px solid var(--line); border-radius:10px;
+    padding:13px 16px; cursor:pointer; transition:.15s;
+    font-size:15px;
+  }
+  .opt:hover{ border-color:#c3cad6; background:#fafbfc; }
+  .opt input{ width:18px; height:18px; accent-color:var(--accent); flex:0 0 auto; }
+  .opt.selected{ border-color:var(--accent); background:var(--accent-soft); }
+  .info-box{
+    background:var(--accent-soft); border:1px solid #c7d2fe;
+    border-radius:12px; padding:22px 20px; font-size:17px; line-height:1.8;
+    margin:18px 0; font-weight:600; color:#1e3a8a;
+  }
+  .dist-table{ width:100%; border-collapse:collapse; margin:16px 0; }
+  .dist-table td{ padding:8px 6px; border-bottom:1px solid var(--line); font-size:14px; vertical-align:middle; }
+  .dist-table td.lab{ color:var(--ink); }
+  .dist-table td.inp{ text-align:right; white-space:nowrap; }
+  .dist-table input{ width:74px; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-size:15px; text-align:right; }
+  .dist-table input:focus{ border-color:var(--accent); outline:none; }
+  .sum-row{ display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:15px; font-weight:700; padding:10px 6px; border-top:2px solid var(--line); }
+  .sum-row .ok{ color:var(--ok); }
+  .sum-row .bad{ color:var(--danger); }
+  .num-field{ margin:18px 0; }
+  .num-field input{ width:140px; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:18px; text-align:center; }
+  .num-field input:focus{ border-color:var(--accent); outline:none; }
+  .num-field .unit{ margin-left:10px; font-size:16px; color:var(--sub); }
+  select.pref{ width:100%; padding:13px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:15px; background:#fff; }
+  select.pref:focus{ border-color:var(--accent); outline:none; }
+  .err{ color:var(--danger); font-size:14px; margin-top:12px; min-height:20px; }
+  .actions{ display:flex; gap:12px; margin-top:26px; }
+  button{
+    font-family:inherit; border:none; cursor:pointer; border-radius:10px;
+    padding:14px 26px; font-size:15px; font-weight:700; transition:.15s;
+  }
+  .btn-primary{ background:var(--accent); color:#fff; flex:1; }
+  .btn-primary:hover{ background:var(--accent-dark); }
+  .btn-primary:disabled{ cursor:not-allowed; opacity:.5; }
+  .btn-ghost{ background:#fff; color:var(--sub); border:1.5px solid var(--line); }
+  .btn-ghost:hover{ background:#f7f8fa; }
+  .btn-danger-link{ background:none; color:var(--sub); text-decoration:underline; font-weight:500; padding:14px 8px; }
+  .center{ text-align:center; }
+  .done-icon{ font-size:48px; text-align:center; margin-bottom:8px; }
+  .footnote{ font-size:12px; color:#9aa5b1; margin-top:14px; text-align:center; }
+  .spinner{
+    width:38px; height:38px; margin:18px auto; border-radius:50%;
+    border:4px solid var(--line); border-top-color:var(--accent);
+    animation:spin .9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-inner">
+      <div class="progress-label">調査の進捗 <span id="pctText">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="pctFill"></div></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card" id="card"></div>
+  </div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   ★★★ 設定：Apps Script ウェブアプリの URL（設定済み） ★★★
+   ============================================================ */
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbziUZo-VkZQMcqwpc8OaHQLOqjhammIkU1yVr3LAeJVjIJLyXifLfj9DIRzcVzu0AaJ/exec";
+
+/* ---------------- 群の割付（A/B/C/D をランダム） ---------------- */
+const GROUPS = ["A", "B", "C", "D"];
+const group = GROUPS[Math.floor(Math.random() * GROUPS.length)];
+
+/* ---------------- 回答セッションのメタ情報 ---------------- */
+const responseId = (function(){
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "r-" + Date.now() + "-" + Math.random().toString(36).slice(2, 10);
+})();
+const startedAt = Date.now();
+const qTimes = {};        // 各設問の滞在秒数 { Q1: 12, ... }
+let qEnterTime = Date.now();
+
+/* ---------------- 共通選択肢 ---------------- */
+const SCALE5_PAST = [ "大きく上がった","少し上がった","変わらない","少し下がった","大きく下がった" ];
+const SCALE5_FUTURE = [ "大きく上がる","少し上がる","変わらない","少し下がる","大きく下がる" ];
+
+const SCALE15 = [
+  "前年比＋12％程度以上（＋11.5％以上）",
+  "前年比＋11％程度（＋10.5％～＋11.4%）",
+  "前年比＋10％程度（＋9.5％～＋10.4%）",
+  "前年比＋９％程度（＋8.5％～＋9.4%）",
+  "前年比＋８％程度（＋7.5％～＋8.4%）",
+  "前年比＋７％程度（＋6.5％～＋7.4%）",
+  "前年比＋６％程度（＋5.5％～＋6.4%）",
+  "前年比＋５％程度（＋4.5％～＋5.4%）",
+  "前年比＋４％程度（＋3.5％～＋4.4%）",
+  "前年比＋３％程度（＋2.5％～＋3.4%）",
+  "前年比＋２％程度（＋1.5％～＋2.4%）",
+  "前年比＋１％程度（＋0.5％～＋1.4%）",
+  "前年比＋０％程度（－0.5%～＋0.4%）",
+  "前年比－１％程度（－1.5％～－0.6%）",
+  "前年比－２％程度以下（－1.6%以下）"
+];
+
+const Q4_CATS = [
+  "（１）12％以上の上昇",
+  "（２）８％以上12％未満の上昇",
+  "（３）４％以上８％未満の上昇",
+  "（４）２％以上４％未満の上昇",
+  "（５）０％以上２％未満の上昇",
+  "（６）０％以上２％未満の下落",
+  "（７）２％以上の下落"
+];
+
+const PREFECTURES = [
+  "北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県",
+  "埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県",
+  "岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県",
+  "鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県",
+  "佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"
+];
+
+/* Q5：群ごとの介入テキスト（A群は表示なし） */
+const Q5_TEXT = {
+  B: "総務省の推計によれば、今年の5月時点の日本の人口は前の年と比べて0.4％減少しました。",
+  C: "日本銀行は、今年度の生鮮食品を除く物価は、前の年度と比べて2.8％上昇すると予想しています。",
+  D: "日本銀行は、物価安定の目標を前年比上昇率2％と定めています。"
+};
+
+/* Q6：群ごとの理解確認（A群は表示なし） */
+const Q6_DEF = {
+  B: { title:"総務省の推計によれば、今年の5月時点の日本の人口は前の年と比べてどの程度変化していましたか。",
+       options:["1.4％減少","0.4％減少","0.4％上昇","1.4％上昇"] },
+  C: { title:"日本銀行は、今年度の生鮮食品を除く物価は、前の年度と比べて何％上昇すると予想していましたか。",
+       options:["1.8％上昇","2.8％上昇","3.8％上昇","4.8％上昇"] },
+  D: { title:"日本銀行は、物価安定の目標を、前年比上昇率で何％に定めていますか。",
+       options:["0％","1％","2％","3％"] }
+};
+
+/* Q5（attention check／介入情報）を表示してから次へ進めるまでの待機秒数 */
+const INFO_DELAY_SEC = 5;
+
+/* ---------------- 質問定義（群に応じて組み立て） ---------------- */
+function buildQuestions(g){
+  const q = [];
+  q.push({ id:"Q1", type:"single", title:"あなたご自身の感じでは、１年前と比べて物価（物価とは、あなたが購入される物やサービスの価格全体（消費税込み）のことです）は上がったと思いますか、下がったと思いますか。", options:SCALE5_PAST });
+  q.push({ id:"Q2", type:"single", title:"あなたご自身の感じでは、１年前と比べて物価の前年比はどの程度変化したと思いますか。", options:SCALE15 });
+  q.push({ id:"Q3", type:"single", title:"今後１年間で物価は上がると思いますか、下がると思いますか。", options:SCALE5_FUTURE });
+  q.push({ id:"Q4", type:"distribution",
+    title:"今後１年間の物価上昇率について、次の１～7の変化はどのくらい可能性があると予想しますか。当てはまる数字をそれぞれ入力してください。合計が100になるようにしてください。",
+    lead:"この質問では将来何かが起こる確率を考えます。0は全く可能性がない、100は確実に起こることを意味します。（例：2～5％＝ほとんど可能性がない／18％前後＝あまり可能性がない／47～52％＝かなり可能性がある／83％前後＝非常に可能性がある／95～98％＝ほぼ確実）",
+    cats:Q4_CATS });
+
+  /* Q5 / Q6 は B・C・D群のみ */
+  if (g !== "A"){
+    q.push({ id:"Q5", type:"info", title:"以下の情報をお読みください。", body:Q5_TEXT[g] });
+    const d = Q6_DEF[g];
+    q.push({ id:"Q6", type:"single", title:d.title, options:d.options, allowBack:true });
+  }
+
+  q.push({ id:"Q7", type:"single", title:"もう一度物価の見通しについてお伺いします。今後１年間で物価の前年比はどの程度変化すると思いますか。", options:SCALE15 });
+  q.push({ id:"Q8", type:"single", title:"あなたは、来年の４月から食料品にかかる消費税は何％になると思いますか。",
+    options:["0％","1％","2％","3％","4％","5％","6％","7％","8％","9％","10％"] });
+  q.push({ id:"Q9", type:"single", title:"あなたの性別をお知らせください。", options:["男性","女性","答えたくない"] });
+  q.push({ id:"Q10", type:"number", title:"あなたの年齢をお知らせください。", unit:"歳", min:0, max:120 });
+  q.push({ id:"Q11", type:"pref", title:"あなたのお住まいをお知らせください。" });
+  q.push({ id:"Q12", type:"single", title:"あなたは結婚していますか。", options:["結婚していない（未婚・離死別）","結婚している"] });
+  q.push({ id:"Q13", type:"single", title:"あなたの職業をお知らせください。",
+    options:["会社員・役員","自営業","専門職（医師、弁護士、美容師、デザイナー等）","公務員","学生","専業主婦・専業主夫","パート・アルバイト・フリーター","無職・定年退職","その他"] });
+  q.push({ id:"Q14", type:"single", title:"あなたの学歴をお答えください。",
+    options:["小学校・中学校卒","高等学校卒","高等専門学校卒","専門学校卒","短期大学卒","大学卒","大学院卒","在学中"] });
+  q.push({ id:"Q15", type:"single", title:"あなたの世帯全体の手取りの年間収入（前年１月～12月までの税金及び社会保険料を除いた収入総額）をお答えください。",
+    options:["200万円未満","200万円～300万円未満","300万円～400万円未満","400万円～550万円未満","550万円～750万円未満","750万円～950万円未満","950万円～1200万円未満","1200万円以上"] });
+  return q;
+}
+
+const QUESTIONS = buildQuestions(group);
+
+/* ---------------- 状態 ---------------- */
+const answers = {};            // { Q1: index/value, ... }
+let stage = "intro";           // intro | question | submitting | done | error | quit
+let qIndex = 0;
+let infoTimer = null;          // info ページの待機タイマー
+
+const cardEl = document.getElementById("card");
+const pctText = document.getElementById("pctText");
+const pctFill = document.getElementById("pctFill");
+const progressWrap = document.getElementById("progressWrap");
+
+/* ---------------- 進捗 ---------------- */
+function updateProgress(){
+  let pct = 0;
+  if (stage === "intro") pct = 3;
+  else if (stage === "question") pct = Math.round(((qIndex + 1) / (QUESTIONS.length + 1)) * 100);
+  else if (stage === "done" || stage === "quit" || stage === "submitting" || stage === "error") pct = 100;
+  pctFill.style.width = pct + "%";
+  pctText.textContent = pct + "%";
+}
+
+/* ---------------- レンダリング ---------------- */
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+function render(){
+  if (infoTimer){ clearInterval(infoTimer); infoTimer = null; }
+  updateProgress();
+  if (stage === "intro") return renderIntro();
+  if (stage === "submitting") return renderSubmitting();
+  if (stage === "done") return renderDone();
+  if (stage === "error") return renderError();
+  if (stage === "quit") return renderQuit();
+  return renderQuestion();
+}
+
+function renderIntro(){
+  const audioBanner = (group === "B" || group === "C")
+    ? `<div class="audio-note">※このアンケートには内容をよくお読みいただく設問が含まれます。落ち着いて回答できる環境でお願いいたします。</div>`
+    : "";
+  cardEl.innerHTML = `
+    <h1>生活意識に関するアンケート調査</h1>
+    ${audioBanner}
+    <div class="intro">
+      <p>この調査は、横浜市立大学大学院の中園善行研究室が実施する、学術的な調査研究です。経済学研究の一環として、最終学歴や世帯年収、物価に関する見通しなどについてお尋ねします。</p>
+      <p>ご回答いただいた内容はすべて統計的に処理され、個人が特定できない形式に変換して取り扱われます。回答の要約データや原データが公開される可能性はありますが、その場合にも個人を特定できる情報と結びつけて公開されることは絶対にありません。また、データをこの調査研究の目的以外に使用することは絶対にありません。</p>
+      <p>回答時間の目安は、5〜10分です。この調査への参加は任意であり、途中でやめることもできます。途中でやめた場合、回答内容は保存されず、謝礼ポイントも付与されません。</p>
+    </div>
+    <div class="actions">
+      <button class="btn-primary" id="agree">同意して参加する</button>
+      <button class="btn-danger-link" id="quitBtn">ここで回答をやめる</button>
+    </div>
+  `;
+  document.getElementById("agree").onclick = () => { stage = "question"; qIndex = 0; qEnterTime = Date.now(); render(); window.scrollTo(0,0); };
+  document.getElementById("quitBtn").onclick = () => { stage = "quit"; render(); window.scrollTo(0,0); };
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[qIndex];
+  let inner = "";
+
+  if (q.type === "single"){
+    inner = `<ul class="options">` + q.options.map((o, i) => {
+      const sel = answers[q.id] === i ? " selected" : "";
+      const chk = answers[q.id] === i ? "checked" : "";
+      return `<li class="opt${sel}" data-i="${i}">
+        <input type="radio" name="${q.id}" value="${i}" ${chk}>
+        <span>${esc(o)}</span></li>`;
+    }).join("") + `</ul>`;
+  }
+  else if (q.type === "info"){
+    inner = `<div class="info-box">「${esc(q.body)}」</div>
+      <p class="lead">内容をご確認のうえ、「次へ進む」を押してください。</p>`;
+  }
+  else if (q.type === "number"){
+    const v = answers[q.id] != null ? answers[q.id] : "";
+    inner = `<div class="num-field"><input type="number" id="numInput" inputmode="numeric" min="${q.min}" max="${q.max}" value="${v}"><span class="unit">${esc(q.unit)}</span></div>`;
+  }
+  else if (q.type === "pref"){
+    const v = answers[q.id];
+    let opts = `<option value="">選択してください</option>`;
+    PREFECTURES.forEach((p, i) => {
+      opts += `<option value="${i+1}" ${v===(i+1)?"selected":""}>${esc(p)}</option>`;
+    });
+    opts += `<option value="99" ${v===99?"selected":""}>その他</option>`;
+    inner = `<select class="pref" id="prefSel">${opts}</select>`;
+  }
+  else if (q.type === "distribution"){
+    const cur = answers[q.id] || {};
+    const rows = q.cats.map((c, i) => {
+      const v = cur[i] != null ? cur[i] : "";
+      return `<tr><td class="lab">${esc(c)}</td>
+        <td class="inp"><input type="number" class="distInput" data-i="${i}" min="0" max="100" value="${v}"> ％</td></tr>`;
+    }).join("");
+    inner = `<table class="dist-table"><tbody>${rows}</tbody></table>
+      <div class="sum-row"><span>合計</span><span id="sumDisplay" class="bad">0 / 100</span></div>`;
+  }
+
+  const lead = q.lead ? `<p class="lead">${esc(q.lead)}</p>` : "";
+  const backBtn = q.allowBack
+    ? `<button class="btn-ghost" id="backBtn">戻る</button>` : "";
+
+  cardEl.innerHTML = `
+    <span class="qnum">${q.id}</span>
+    <h2 class="qtitle">${esc(q.title)}</h2>
+    ${lead}
+    ${inner}
+    <div class="err" id="err"></div>
+    <div class="actions">
+      ${backBtn}
+      <button class="btn-primary" id="nextBtn">次へ進む</button>
+    </div>
+  `;
+
+  /* イベント */
+  if (q.type === "single"){
+    cardEl.querySelectorAll(".opt").forEach(el => {
+      el.onclick = () => {
+        const i = parseInt(el.dataset.i, 10);
+        answers[q.id] = i;
+        cardEl.querySelectorAll(".opt").forEach(o => o.classList.remove("selected"));
+        el.classList.add("selected");
+        el.querySelector("input").checked = true;
+        document.getElementById("err").textContent = "";
+      };
+    });
+  }
+  if (q.type === "distribution"){
+    const recalc = () => {
+      let sum = 0;
+      cardEl.querySelectorAll(".distInput").forEach(inp => {
+        const n = parseInt(inp.value, 10);
+        if (!isNaN(n)) sum += n;
+      });
+      const disp = document.getElementById("sumDisplay");
+      disp.textContent = sum + " / 100";
+      disp.className = sum === 100 ? "ok" : "bad";
+    };
+    cardEl.querySelectorAll(".distInput").forEach(inp => inp.addEventListener("input", recalc));
+    recalc();
+  }
+
+  if (q.allowBack){
+    document.getElementById("backBtn").onclick = () => {
+      recordTime(q.id);
+      qIndex = Math.max(0, qIndex - 1);
+      qEnterTime = Date.now();
+      render(); window.scrollTo(0,0);
+    };
+  }
+  document.getElementById("nextBtn").onclick = onNext;
+
+  /* info（Q5：B・C・D群）は INFO_DELAY_SEC 秒間「次へ進む」を押せないようにする */
+  if (q.type === "info"){
+    const btn = document.getElementById("nextBtn");
+    let remain = INFO_DELAY_SEC;
+    btn.disabled = true;
+    btn.textContent = "次へ進む（" + remain + "秒）";
+    infoTimer = setInterval(() => {
+      remain--;
+      if (remain > 0){
+        btn.textContent = "次へ進む（" + remain + "秒）";
+      } else {
+        clearInterval(infoTimer); infoTimer = null;
+        btn.disabled = false;
+        btn.textContent = "次へ進む";
+      }
+    }, 1000);
+  }
+}
+
+/* 設問の滞在時間を加算 */
+function recordTime(qid){
+  qTimes[qid] = (qTimes[qid] || 0) + Math.round((Date.now() - qEnterTime) / 1000);
+}
+
+function onNext(){
+  const q = QUESTIONS[qIndex];
+  const err = document.getElementById("err");
+  err.textContent = "";
+
+  if (q.type === "single"){
+    if (answers[q.id] == null){ err.textContent = "選択肢をひとつ選んでください。"; return; }
+  }
+  else if (q.type === "number"){
+    const raw = document.getElementById("numInput").value.trim();
+    const n = parseInt(raw, 10);
+    if (raw === "" || isNaN(n) || n < q.min || n > q.max){ err.textContent = "正しい数値を入力してください。"; return; }
+    answers[q.id] = n;
+  }
+  else if (q.type === "pref"){
+    const v = parseInt(document.getElementById("prefSel").value, 10);
+    if (!v){ err.textContent = "お住まいを選択してください。"; return; }
+    answers[q.id] = v;
+  }
+  else if (q.type === "distribution"){
+    const obj = {}; let sum = 0; let bad = false;
+    cardEl.querySelectorAll(".distInput").forEach(inp => {
+      const raw = inp.value.trim();
+      const n = parseInt(raw, 10);
+      if (raw === "" || isNaN(n) || n < 0 || n > 100){ bad = true; }
+      const val = isNaN(n) ? 0 : n;
+      obj[parseInt(inp.dataset.i,10)] = val;
+      sum += val;
+    });
+    if (bad){ err.textContent = "各欄に0〜100の数値を入力してください。"; return; }
+    if (sum !== 100){ err.textContent = "合計が100になるように入力してください（現在 " + sum + "）。"; return; }
+    answers[q.id] = obj;
+  }
+  /* info は検証なし */
+
+  recordTime(q.id);
+
+  if (qIndex < QUESTIONS.length - 1){
+    qIndex++;
+    qEnterTime = Date.now();
+    render(); window.scrollTo(0,0);
+  } else {
+    stage = "submitting";
+    render(); window.scrollTo(0,0);
+    submitData();
+  }
+}
+
+/* ---------------- 送信用レコードの組み立て ---------------- */
+function buildRecord(){
+  const rec = {};
+  rec.responseId = responseId;
+  rec.group = group;
+  rec.startedAt = new Date(startedAt).toISOString();
+  rec.submittedAt = new Date().toISOString();
+  rec.durationSec = Math.round((Date.now() - startedAt) / 1000);
+  rec.userAgent = navigator.userAgent;
+
+  QUESTIONS.forEach(q => {
+    const a = answers[q.id];
+    if (q.type === "single"){
+      if (a != null){ rec[q.id] = a + 1; rec[q.id + "_label"] = q.options[a]; }
+    } else if (q.type === "number"){
+      if (a != null) rec[q.id] = a;
+    } else if (q.type === "pref"){
+      if (a != null){ rec[q.id] = a; rec[q.id + "_label"] = (a === 99 ? "その他" : PREFECTURES[a - 1]); }
+    } else if (q.type === "distribution"){
+      if (a){ for (let i = 0; i < q.cats.length; i++){ rec[q.id + "_" + (i + 1)] = (a[i] != null ? a[i] : 0); } }
+    }
+    /* info（Q5）は回答なし。提示内容は群で判別可能 */
+  });
+
+  /* 各設問の滞在秒数 */
+  Object.keys(qTimes).forEach(k => { rec["sec_" + k] = qTimes[k]; });
+
+  return rec;
+}
+
+/* ---------------- 送信処理（再送あり・重複は Apps Script 側で防止） ---------------- */
+let submitAttempts = 0;
+
+function submitData(){
+  if (!ENDPOINT || ENDPOINT.indexOf("PASTE_YOUR") === 0){
+    console.warn("[ENDPOINT 未設定] 以下のデータは送信されていません：", buildRecord());
+    stage = "done"; render(); window.scrollTo(0,0);
+    return;
+  }
+
+  submitAttempts++;
+  const body = JSON.stringify(buildRecord());
+
+  // CORS を避けるため no-cors / text-plain で送信（Apps Script は e.postData.contents で受信）
+  fetch(ENDPOINT, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: body
+  })
+  .then(() => { stage = "done"; render(); window.scrollTo(0,0); })
+  .catch(() => {
+    if (submitAttempts < 3){
+      setTimeout(submitData, 1500);   // 自動リトライ（responseId で重複防止）
+    } else {
+      stage = "error"; render(); window.scrollTo(0,0);
+    }
+  });
+}
+
+function renderSubmitting(){
+  cardEl.innerHTML = `
+    <h1 class="center">回答を送信しています…</h1>
+    <div class="spinner"></div>
+    <p class="lead center">このまましばらくお待ちください。画面を閉じないでください。</p>
+  `;
+}
+
+function renderDone(){
+  cardEl.innerHTML = `
+    <div class="done-icon">✅</div>
+    <h1 class="center">ご回答ありがとうございました</h1>
+    <p class="lead center">回答は正常に送信されました。<br>このページを閉じていただいて構いません。</p>
+    <p class="footnote">受付ID：${esc(responseId)}</p>
+  `;
+}
+
+function renderError(){
+  cardEl.innerHTML = `
+    <h1 class="center">送信に失敗しました</h1>
+    <p class="lead center">通信環境をご確認のうえ、もう一度お試しください。<br>ご回答内容は保持されています。</p>
+    <div class="actions">
+      <button class="btn-primary" id="retryBtn">もう一度送信する</button>
+    </div>
+  `;
+  document.getElementById("retryBtn").onclick = () => {
+    submitAttempts = 0;
+    stage = "submitting"; render(); window.scrollTo(0,0);
+    submitData();
+  };
+}
+
+function renderQuit(){
+  progressWrap.style.display = "none";
+  cardEl.innerHTML = `
+    <h1 class="center">回答を終了しました</h1>
+    <p class="lead center">この調査への回答は途中で終了されました。回答内容は保存されません。<br>ご協力ありがとうございました。</p>
+  `;
+}
+
+/* 起動 */
+render();
+</script>
+</body>
+</html>
